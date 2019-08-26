@@ -4,8 +4,7 @@ const axios = require('axios');
 
 const app = express();
 
-// app.use(express.urlencoded({extended: false}));
-
+// Five asynchronous functions for testing with series and parallel
 function first(cb) {
   axios.get("https://jsonplaceholder.typicode.com/users/1")
     .then(response => {
@@ -37,10 +36,12 @@ function fifth(cb) {
     })
 }
 
+// Main index route
 app.get('/', (req, res) => {
   res.send("dis be da root");
 });
 
+// Route to test "Series" - calls functions in order as they complete
 app.get('/series', (req, res) => {
   async.series([first, second, third, fourth, fifth])
     .then(results => {
@@ -48,6 +49,7 @@ app.get('/series', (req, res) => {
     })
 });
 
+// Route to test "Parallel" - calls functions without waiting for completions
 app.get('/parallel', (req, res) => {
   async.parallel([first, second, third, fourth, fifth])
     .then(results => {
@@ -55,6 +57,7 @@ app.get('/parallel', (req, res) => {
     })
 });
 
+// Route to test "Waterfall" - passes data from one function call to the next
 app.get('/waterfall', (req, res) => {
   function wFirst(cb) {
     axios.get("https://jsonplaceholder.typicode.com/users/1")
@@ -79,6 +82,7 @@ app.get('/waterfall', (req, res) => {
   })
 });
 
+// Route for testing "Concat" - calls functions in parallel and concatenates results
 app.get('/concat', (req, res) => {
   let urls = ["https://jsonplaceholder.typicode.com/users/1",
               "https://jsonplaceholder.typicode.com/users/2",
